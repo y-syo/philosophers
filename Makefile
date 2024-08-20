@@ -6,7 +6,7 @@
 #    By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 07:21:18 by mmoussou          #+#    #+#              #
-#    Updated: 2024/07/15 23:36:55 by mmoussou         ###   ########.fr        #
+#    Updated: 2024/08/19 08:47:29 by mmoussou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,13 +14,7 @@ SHELL = bash
 
 CC = gcc
 
-LIBFT_DIR = ./libft
-
-LIBFT = $(LIBFT_DIR)/libft.a
-
-LIBFT_INCLUDE = $(LIBFT_DIR)/include
-
-CFLAGS = -pthread -Wall -Werror -Wextra -g
+CFLAGS = -pthread -g #-Wall -Werror -Wextra
 
 INCLUDE = ./include
 
@@ -34,35 +28,26 @@ OBJS_DIR = obj/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
 
 
-all: $(NAME)
-
-$(LIBFT_DIR):
-	@git clone https://github.com/y-syo/libft $(LIBFT_DIR)
-	@printf " \x1B[1;34m[  ]\x1B[0m Cloned libft.\n"
-
-$(LIBFT): $(LIBFT_DIR)
-	@make -s -C $(LIBFT_DIR)
+all: $(NAME) clean
 
 $(OBJS_DIR)%.o: %.c
 	@mkdir -p $(@D)
-	@printf "\x1B[2K\r \x1B[1;32m[ 󱌣 ]\x1B[0m Compiling Objects... : $<"
-	@$(CC) $(CFLAGS) -I$(INCLUDE) -I$(LIBFT_INCLUDE) $< -c -o $@
+	@printf "\x1B[2K\r \x1B[1;32m[ 󱌣 ]\x1B[0m compiling objects... : $<"
+	@$(CC) $(CFLAGS) -I$(INCLUDE) $< -c -o $@
 
-$(NAME): $(LIBFT) $(OBJS)
-	@printf "\x1B[2K\r \x1B[1;32m[ 󱌣 ]\x1B[0m Objects Compiled."
-	@printf "\n \x1B[1;33m[ 󱉟 ]\x1B[0m Compiling $(NAME)..."
-	@$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -I$(INCLUDE) -I$(LIBFT_INCLUDE) -o $(NAME)
-	@printf "\x1B[2K\r \x1B[1;33m[ 󱉟 ]\x1B[0m $(NAME) Compiled.\n"
+$(NAME): $(OBJS)
+	@printf "\x1B[2K\r \x1B[1;32m[ 󱌣 ]\x1B[0m objects compiled."
+	@printf "\n \x1B[1;33m[ 󱉟 ]\x1B[0m compiling $(NAME)..."
+	@$(CC) $(CFLAGS) $(OBJS) -I$(INCLUDE) -o $(NAME)
+	@printf "\x1B[2K\r \x1B[1;33m[ 󱉟 ]\x1B[0m $(NAME) compiled.\n"
 
 clean:
-	@make -s -C $(LIBFT_DIR) clean
-	@rm -f $(OBJS)
-	@printf " \x1B[1;31m[  ]\x1B[0m Deleted Objects.\n"
+	@rm -rf $(OBJS_DIR)
+	@printf " \x1B[1;31m[  ]\x1B[0m deleted objects.\n"
 
 fclean: clean
-	@make -s -C $(LIBFT_DIR) clean
 	@rm -f $(NAME)
-	@printf " \x1B[1;31m[  ]\x1B[0m Deleted $(NAME).\n"
+	@printf " \x1B[1;31m[  ]\x1B[0m deleted $(NAME).\n"
 
 re: fclean all
 
