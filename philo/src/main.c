@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/20 17:03:44 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/21 14:17:36 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,17 +96,17 @@ unsigned long long	get_time(unsigned long long start_time)
 
 void	eating(t_philo *philo)
 {
-	
+	unsigned long long	end_time;
+
 	printf(EATING_STR, get_time(philo->data->start_time), philo->id);
-	/*
-	 *end_time = get_time() + philo->data->start_time;
-	 * while (get_time(start_time) < end_time)
-	 * usleep(100);
-	 * check si toujours vivant (faire une fonction qui retire la saturation pour le sommeil et une qui le fait pas pour le manger)
-	 * check la difference de temps
-	 * }
-	*/
-	usleep(philo->data->time_eat * 1000);
+	end_time = get_time() + philo->data->start_time;
+	while (get_time(start_time) < end_time)
+	{
+		usleep(100);
+		//check si toujours vivant (faire une fonction qui retire la saturation pour le sommeil et une qui le fait pas pour le manger);
+		//check la difference de temps;
+	}
+	philo->saturation = philo->data->time_die;
 }
 
 void	sleeping(t_philo *philo)
