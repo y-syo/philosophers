@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/21 14:17:36 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/22 14:57:03 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ int	data_init(t_main *program, int ac, char **av)
 	return (0);
 }
 
-void	philo_init(t_main *program, t_philo *philos, pthread_mutex_t *forks)
+void	philo_init(t_main *program, t_philo *philos,
+				pthread_mutex_t *forks, char *forks_state)
 {
 	int	i;
 
@@ -71,9 +72,15 @@ void	philo_init(t_main *program, t_philo *philos, pthread_mutex_t *forks)
 			philos[i].r_fork = &(forks[0]);
 		else
 			philos[i].r_fork = &(forks[i + 1]);
+		philos[i].l_fork_state = &(forks_state[i]);
+		if (i + 1 == program->number_of_philos)
+			philos[i].r_fork_state = &(forks_state[0]);
+		else
+			philos[i].r_fork_state = &(forks_state[i + 1]);
 		philos[i].saturation = program->data.time_die;
 		philos[i].number_of_meal = program->data.number_of_meal;
 		philos[i].data = &(program->data);
+		philos[i].id = i + 1;
 	}
 }
 
@@ -81,8 +88,6 @@ void	wait_to_die(t_philo philo)
 {
 	printf(DIED_STR, (long long) philo.data->time_die, philo.id);
 }
-
-	// ------------------------------------------------------------------------------------------------------------------------------------------
 
 unsigned long long	get_time(unsigned long long start_time)
 {
@@ -94,31 +99,130 @@ unsigned long long	get_time(unsigned long long start_time)
 	return (actual_time - start_time);
 }
 
-void	eating(t_philo *philo)
+unsigned long long	is_alive(t_philo *philo)
 {
-	unsigned long long	end_time;
+	if (!(philo->data->alive))
+		return (-1);
+	if (philo->saturation < 0 || philo->number_of_meal == 0)
+	{
+		if (philo->number_of_meal)
+			printf(DIED_STR, get_time(philo->data->start_time), philo->id);
+		philo->data->alive = 0;
+		return (-1);
+	}
+	return (0);
+}
 
-	printf(EATING_STR, get_time(philo->data->start_time), philo->id);
-	end_time = get_time() + philo->data->start_time;
-	while (get_time(start_time) < end_time)
+void	leave_forks(t_philo *philo)
+{
+	pthread_mutex_lock(philo->l_fork);
+	*(philo->l_fork_state) = 0;
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_lock(philo->r_fork);
+	*(philo->r_fork_state) = 0;
+	pthread_mutex_unlock(philo->r_fork);
+}
+
+void	grab_forks(t_philo *philo)
+{
+	pthread_mutex_lock(philo->l_fork);
+	*(philo->l_fork_state) = 1;
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_lock(philo->r_fork);
+	*(philo->r_fork_state) = 1;
+	pthread_mutex_unlock(philo->r_fork);
+	printf(FORK_STR, get_time(philo->data->start_time), philo->id);
+	printf(FORK_STR, get_time(philo->data->start_time), philo->id);
+}
+
+char	check_fork(pthread_mutex_t *fork, char *fork_state)
+{
+	char	value;
+
+	pthread_mutex_lock(fork);
+	value = *(fork_state);
+	pthread_mutex_unlock(fork);
+	return (value);
+}
+
+int	take_forks(t_philo *philo)
+{
+	unsigned long long	start_time;
+	unsigned long long	elapsed_time;
+
+	start_time = get_time(philo->data->start_time);
+	if (is_alive(philo))
+		return (-1);
+	while (check_fork(philo->l_fork, philo->l_fork_state)
+		|| check_fork(philo->r_fork, philo->r_fork_state))
 	{
 		usleep(100);
-		//check si toujours vivant (faire une fonction qui retire la saturation pour le sommeil et une qui le fait pas pour le manger);
-		//check la difference de temps;
+		if (is_alive(philo))
+			return (-1);
+		elapsed_time = get_time(philo->data->start_time);
+		philo->saturation -= elapsed_time - start_time;
+		start_time = elapsed_time;
 	}
+	grab_forks(philo);
+	return (0);
+}
+
+int	eating(t_philo *philo)
+{
+	unsigned long long	elapsed_time;
+	unsigned long long	start_time;
+	unsigned long long	end_time;
+
+	start_time = get_time(philo->data->start_time);
+	printf(EATING_STR, start_time, philo->id);
+	end_time = start_time + philo->data->time_eat;
 	philo->saturation = philo->data->time_die;
+	while (get_time(philo->data->start_time) < end_time)
+	{
+		usleep(100);
+		if (is_alive(philo))
+		{
+			leave_forks(philo);
+			return (-1);
+		}
+		elapsed_time = get_time(philo->data->start_time);
+		philo->saturation -= elapsed_time - start_time;
+		start_time = elapsed_time;
+	}
+	leave_forks(philo);
+	if (philo->number_of_meal > 0)
+		philo->number_of_meal--;
+	return (0);
 }
 
-void	sleeping(t_philo *philo)
+int	sleeping(t_philo *philo)
 {
-	printf(SLEEPING_STR, get_time(philo->data->start_time), philo->id);
-	usleep(philo->data->time_sleep * 1000);
+	unsigned long long	end_time;
+	unsigned long long	start_time;
+	unsigned long long	elapsed_time;
+
+	start_time = get_time(philo->data->start_time);
+	printf(SLEEPING_STR, start_time, philo->id);
+	end_time = start_time + philo->data->time_sleep;
+	while (get_time(philo->data->start_time) < end_time)
+	{
+		usleep(100);
+		if (is_alive(philo))
+			return (-1);
+		elapsed_time = get_time(philo->data->start_time);
+		philo->saturation -= elapsed_time - start_time;
+		start_time = elapsed_time;
+	}
+	return (0);
 }
 
-void	thinking(t_philo *philo)
+int	thinking(t_philo *philo)
 {
+	if (is_alive(philo))
+		return (-1);
 	printf(THINKING_STR, get_time(philo->data->start_time), philo->id);
-	//take_forks();
+	take_forks(philo);
+	return (0);
 }
 
 void	*philo_routine(void *arg)
@@ -126,16 +230,20 @@ void	*philo_routine(void *arg)
 	t_philo	*philo;
 
 	philo = arg;
-	while (philo->data->alive)
+	if (philo->id % 2)
+		usleep(50);
+	take_forks(philo);
+	while (!is_alive(philo))
 	{
-		eating(philo);
-		sleeping(philo);
-		thinking(philo);
+		if (eating(philo))
+			return (NULL);
+		if (sleeping(philo))
+			return (NULL);
+		if (thinking(philo))
+			return (NULL);
 	}
 	return (NULL);
 }
-
-	// ------------------------------------------------------------------------------------------------------------------------------------------
 
 void	philo(t_main program, t_philo *philos)
 {
@@ -160,6 +268,7 @@ int	main(int ac, char **av)
 	t_main			program;
 	t_philo			philos[PHILO_MAX];
 	pthread_mutex_t	forks[PHILO_MAX];
+	char			forks_state[PHILO_MAX];
 
 	if (ac < 5 || ac > 6)
 	{
@@ -171,7 +280,7 @@ int	main(int ac, char **av)
 	//	return (1);
 	if (data_init(&program, ac, av))
 		return (-1);
-	philo_init(&program, philos, forks);
+	philo_init(&program, philos, forks, forks_state);
 	if (program.number_of_philos == 1)
 		wait_to_die(philos[0]);
 	else

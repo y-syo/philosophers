@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/20 16:34:11 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/22 14:39:31 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,10 @@ typedef struct s_philo
 	pthread_t		thread;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
+	char			*l_fork_state;
+	char			*r_fork_state;
 	t_data			*data;
-	unsigned int	saturation;
+	long long		saturation;
 	unsigned int	number_of_meal;
 	unsigned int	id;
 }					t_philo;
@@ -49,10 +51,10 @@ typedef struct s_main
 	t_data			data;
 }				t_main;
 
-# define FORK_STR "%lld %d has taken a fork\n\x1b[0m"
-# define SLEEPING_STR "%lld %d is sleeping\n\x1b[0m"
-# define THINKING_STR "%lld %d is thinking\n\x1b[0m"
-# define EATING_STR "%lld %d is eating\n\x1b[0m"
-# define DIED_STR "%lld %d died\n\x1b[0m"
+# define FORK_STR "\x1b[1;35m%lld %d has taken a fork\n\x1b[0m"
+# define SLEEPING_STR "\x1b[1;34m%lld %d is sleeping\n\x1b[0m"
+# define THINKING_STR "\x1b[1;32m%lld %d is thinking\n\x1b[0m"
+# define EATING_STR "\x1b[1;36m%lld %d is eating\n\x1b[0m"
+# define DIED_STR "\x1b[1;31m%lld %d died\n\x1b[0m"
 
 #endif
