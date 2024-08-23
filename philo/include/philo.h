@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:59:18 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 22:55:22 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ typedef struct s_main
 # define EATING_STR "\x1b[1;36m%lld %d is eating\n\x1b[0m"
 # define DIED_STR "\x1b[1;31m%lld %d died\n\x1b[0m"
 
+int					ft_strlen(const char *s);
 int					ft_atoi(const char *str);
 unsigned long long	get_time(unsigned long long start_time);
 
@@ -77,5 +78,7 @@ char				check_mutex(pthread_mutex_t *mutex, int *mutex_value);
 int					take_forks(t_philo *philo);
 void				leave_forks(t_philo *philo);
 void				*philo_routine(void *arg);
+
+int					check_args(int ac, char **av);
 
 #endif

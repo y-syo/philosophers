@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:51:45 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 23:02:08 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,11 @@ int	main(int ac, char **av)
 [number_of_times_each_philosopher_must_eat]\n");
 		return (1);
 	}
-	//if (check_args(av))
-	//	return (1);
+	if (check_args(ac, av))
+	{
+		printf("error: bad arguments\n");
+		return (1);
+	}
 	if (data_init(&program, ac, av))
 		return (-1);
 	philo_init(&program, philos, forks, forks_state);

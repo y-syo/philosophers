@@ -6,11 +6,21 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:40:04 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:58:14 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 22:55:09 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+int	ft_strlen(const char *s)
+{
+	const char	*endptr;
+
+	endptr = s;
+	while (*endptr)
+		endptr++;
+	return (endptr - s);
+}
 
 int	ft_atoi(const char *str)
 {

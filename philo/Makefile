@@ -6,7 +6,7 @@
 #    By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 07:21:18 by mmoussou          #+#    #+#              #
-#    Updated: 2024/08/23 15:01:35 by mmoussou         ###   ########.fr        #
+#    Updated: 2024/08/23 22:54:25 by mmoussou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,14 +14,21 @@ SHELL = bash
 
 CC = gcc
 
-CFLAGS = -pthread -g -Wall -Werror -Wextra
+CFLAGS = -pthread -Wall -Werror -Wextra
 
 INCLUDE = ./include
 
 NAME = philo
 
 #find -type f -name "*.c" | sed "s/\.\///g" | xargs -Iname echo "`printf '\t\t\t'`" name "\\"
-SRCS = $(shell find src -name '*.c')
+SRCS =					src/routine_utils.c \
+                        src/mutex_utils.c \
+                        src/parsing.c \
+                        src/routine.c \
+                        src/forks.c \
+                        src/main.c \
+                        src/utils.c \
+                        src/inits.c \
 
 OBJS_DIR = obj/
 
