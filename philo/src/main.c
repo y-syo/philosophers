@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 12:25:50 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 14:32:59 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,21 +52,26 @@ int	data_init(t_main *program, int ac, char **av)
 	program->data.number_of_philo = -1;
 	if (ac == 6)
 	{
+		program->data.number_of_meal = ft_atoi(av[5]);
 		program->data.number_of_philo = ft_atoi(av[1]);
 	}
 	if (gettimeofday(&tv, NULL))
 		return (-1);
 	program->data.start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	pthread_mutex_init(&(program->data.print_mutex), 0);
+	pthread_mutex_init(&(program->data.alive_mutex), 0);
+	pthread_mutex_init(&(program->data.num_philo_mutex), 0);
 	return (0);
 }
 
 void	philo_init(t_main *program, t_philo *philos,
-				pthread_mutex_t *forks, char *forks_state)
+				pthread_mutex_t *forks, int *forks_state)
 {
-	int	i;
+	unsigned int	i;
 
 	i = program->number_of_philos;
-	memset(forks, 0, sizeof(pthread_mutex_t));
+	memset(forks, 0, sizeof(pthread_mutex_t) * PHILO_MAX);
+	memset(forks_state, 0, sizeof(char) * PHILO_MAX);
 	while (i)
 	{
 		i--;
@@ -87,9 +92,27 @@ void	philo_init(t_main *program, t_philo *philos,
 	}
 }
 
+void	print(char *str, unsigned long long timestamp, t_philo *philo)
+{
+	pthread_mutex_lock(&(philo->data->print_mutex));
+	printf(str, timestamp, philo->id);
+	pthread_mutex_unlock(&(philo->data->print_mutex));
+}
+
+char	check_mutex(pthread_mutex_t *mutex, int *mutex_value)
+{
+	int	value;
+
+	pthread_mutex_lock(mutex);
+	value = *(mutex_value);
+	pthread_mutex_unlock(mutex);
+	return (value);
+}
+
 void	wait_to_die(t_philo philo)
 {
-	printf(DIED_STR, (long long) philo.data->time_die, philo.id);
+	usleep(philo.data->time_die * 1000);
+	print(DIED_STR, (long long) philo.data->time_die, &philo);
 }
 
 unsigned long long	get_time(unsigned long long start_time)
@@ -104,26 +127,20 @@ unsigned long long	get_time(unsigned long long start_time)
 
 unsigned long long	is_alive(t_philo *philo)
 {
-	if (!(philo->data->alive))
+	if (!(check_mutex(&(philo->data->alive_mutex), &philo->data->alive)))
 		return (-1);
-	if (philo->saturation < 0 || philo->number_of_meal == 0)
+	if (philo->saturation < 0 || !check_mutex(&(philo->data->num_philo_mutex),
+			&(philo->data->number_of_philo)))
 	{
-		if (philo->number_of_meal)
-			printf(DIED_STR, get_time(philo->data->start_time), philo->id);
+		if (check_mutex(&(philo->data->num_philo_mutex),
+				&(philo->data->number_of_philo)))
+			print(DIED_STR, get_time(philo->data->start_time), philo);
+		pthread_mutex_lock(&(philo->data->alive_mutex));
 		philo->data->alive = 0;
+		pthread_mutex_unlock(&(philo->data->alive_mutex));
 		return (-1);
 	}
 	return (0);
-}
-
-char	check_fork(pthread_mutex_t *fork, char *fork_state)
-{
-	char	value;
-
-	pthread_mutex_lock(fork);
-	value = *(fork_state);
-	pthread_mutex_unlock(fork);
-	return (value);
 }
 
 void	leave_forks(t_philo *philo)
@@ -144,8 +161,25 @@ void	grab_forks(t_philo *philo)
 	pthread_mutex_lock(philo->r_fork);
 	*(philo->r_fork_state) = 1;
 	pthread_mutex_unlock(philo->r_fork);
-	printf(FORK_STR, get_time(philo->data->start_time), philo->id);
-	printf(FORK_STR, get_time(philo->data->start_time), philo->id);
+	print(FORK_STR, get_time(philo->data->start_time), philo);
+	print(FORK_STR, get_time(philo->data->start_time), philo);
+}
+
+void	grab_fork(char mode, t_philo *philo)
+{
+	if (mode)
+	{
+		pthread_mutex_lock(philo->l_fork);
+		*(philo->l_fork_state) = 1;
+		pthread_mutex_unlock(philo->l_fork);
+	}
+	else
+	{
+		pthread_mutex_lock(philo->r_fork);
+		*(philo->r_fork_state) = 1;
+		pthread_mutex_unlock(philo->r_fork);
+	}
+	print(FORK_STR, get_time(philo->data->start_time), philo);
 }
 
 int	take_forks(t_philo *philo)
@@ -156,17 +190,26 @@ int	take_forks(t_philo *philo)
 	start_time = get_time(philo->data->start_time);
 	if (is_alive(philo))
 		return (-1);
-	while (check_fork(philo->l_fork, philo->l_fork_state)
-		|| check_fork(philo->r_fork, philo->r_fork_state))
+	while (check_mutex(philo->r_fork, philo->r_fork_state))
 	{
-		//usleep(100);
+		usleep(100);
 		if (is_alive(philo))
 			return (-1);
 		elapsed_time = get_time(philo->data->start_time);
 		philo->saturation -= elapsed_time - start_time;
 		start_time = elapsed_time;
 	}
-	grab_forks(philo);
+	grab_fork(0, philo);
+	while (check_mutex(philo->l_fork, philo->l_fork_state))
+	{
+		usleep(100);
+		if (is_alive(philo))
+			return (-1);
+		elapsed_time = get_time(philo->data->start_time);
+		philo->saturation -= elapsed_time - start_time;
+		start_time = elapsed_time;
+	}
+	grab_fork(1, philo);
 	return (0);
 }
 
@@ -177,7 +220,7 @@ int	eating(t_philo *philo)
 	unsigned long long	end_time;
 
 	start_time = get_time(philo->data->start_time);
-	printf(EATING_STR, start_time, philo->id);
+	print(EATING_STR, start_time, philo);
 	end_time = start_time + philo->data->time_eat;
 	philo->saturation = philo->data->time_die;
 	while (get_time(philo->data->start_time) < end_time)
@@ -195,6 +238,13 @@ int	eating(t_philo *philo)
 	leave_forks(philo);
 	if (philo->number_of_meal > 0)
 		philo->number_of_meal--;
+	if (philo->number_of_meal == 0)
+	{
+		pthread_mutex_lock(&(philo->data->num_philo_mutex));
+		philo->data->number_of_philo -= 1;
+		pthread_mutex_unlock(&(philo->data->num_philo_mutex));
+		philo->number_of_meal--;
+	}
 	return (0);
 }
 
@@ -205,7 +255,7 @@ int	sleeping(t_philo *philo)
 	unsigned long long	elapsed_time;
 
 	start_time = get_time(philo->data->start_time);
-	printf(SLEEPING_STR, start_time, philo->id);
+	print(SLEEPING_STR, start_time, philo);
 	end_time = start_time + philo->data->time_sleep;
 	while (get_time(philo->data->start_time) < end_time)
 	{
@@ -223,8 +273,9 @@ int	thinking(t_philo *philo)
 {
 	if (is_alive(philo))
 		return (-1);
-	printf(THINKING_STR, get_time(philo->data->start_time), philo->id);
-	take_forks(philo);
+	print(THINKING_STR, get_time(philo->data->start_time), philo);
+	if (take_forks(philo))
+		return (-1);
 	return (0);
 }
 
@@ -233,6 +284,8 @@ void	*philo_routine(void *arg)
 	t_philo	*philo;
 
 	philo = arg;
+	if (philo->id % 2 == 1)
+		usleep(500);
 	take_forks(philo);
 	while (!is_alive(philo))
 	{
@@ -248,7 +301,7 @@ void	*philo_routine(void *arg)
 
 void	philo(t_main program, t_philo *philos)
 {
-	int	i;
+	unsigned int	i;
 
 	i = 0;
 	while (i < program.number_of_philos)
@@ -269,7 +322,7 @@ int	main(int ac, char **av)
 	t_main			program;
 	t_philo			philos[PHILO_MAX];
 	pthread_mutex_t	forks[PHILO_MAX];
-	char			forks_state[PHILO_MAX];
+	int				forks_state[PHILO_MAX];
 
 	if (ac < 5 || ac > 6)
 	{

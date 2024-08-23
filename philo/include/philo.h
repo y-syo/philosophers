@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 11:32:34 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 14:09:57 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,12 @@ typedef struct s_data
 	unsigned int		time_sleep;
 	unsigned int		time_die;
 	unsigned int		number_of_meal;
-	unsigned int		number_of_philo;
-	char				alive;
+	int					number_of_philo;
+	int					alive;
 	unsigned long long	start_time;
+	pthread_mutex_t		print_mutex;
+	pthread_mutex_t		alive_mutex;
+	pthread_mutex_t		num_philo_mutex;
 }				t_data;
 
 typedef struct s_philo
@@ -38,8 +41,8 @@ typedef struct s_philo
 	pthread_t		thread;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
-	char			*l_fork_state;
-	char			*r_fork_state;
+	int				*l_fork_state;
+	int				*r_fork_state;
 	t_data			*data;
 	long long		saturation;
 	unsigned int	number_of_meal;

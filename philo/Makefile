@@ -6,7 +6,7 @@
 #    By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 07:21:18 by mmoussou          #+#    #+#              #
-#    Updated: 2024/08/19 08:47:29 by mmoussou         ###   ########.fr        #
+#    Updated: 2024/08/23 14:19:58 by mmoussou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ SHELL = bash
 
 CC = gcc
 
-CFLAGS = -pthread -g #-Wall -Werror -Wextra
+CFLAGS = -pthread -g -Wall -Werror -Wextra
 
 INCLUDE = ./include
 
