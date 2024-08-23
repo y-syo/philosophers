@@ -6,7 +6,7 @@
 #    By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 07:21:18 by mmoussou          #+#    #+#              #
-#    Updated: 2024/08/23 14:19:58 by mmoussou         ###   ########.fr        #
+#    Updated: 2024/08/23 15:01:35 by mmoussou         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,7 +28,7 @@ OBJS_DIR = obj/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.c=.o))
 
 
-all: $(NAME) clean
+all: $(NAME)
 
 $(OBJS_DIR)%.o: %.c
 	@mkdir -p $(@D)

@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:09:57 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 14:59:18 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,5 +60,22 @@ typedef struct s_main
 # define THINKING_STR "\x1b[1;32m%lld %d is thinking\n\x1b[0m"
 # define EATING_STR "\x1b[1;36m%lld %d is eating\n\x1b[0m"
 # define DIED_STR "\x1b[1;31m%lld %d died\n\x1b[0m"
+
+int					ft_atoi(const char *str);
+unsigned long long	get_time(unsigned long long start_time);
+
+int					data_init(t_main *program, int ac, char **av);
+void				philo_init(t_main *program, t_philo *philos,
+						pthread_mutex_t *forks, int *forks_state);
+
+unsigned long long	is_alive(t_philo *philo);
+void				set_meal_number(t_philo *philo);
+void				print(char *str, unsigned long long timestamp,
+						t_philo *philo);
+char				check_mutex(pthread_mutex_t *mutex, int *mutex_value);
+
+int					take_forks(t_philo *philo);
+void				leave_forks(t_philo *philo);
+void				*philo_routine(void *arg);
 
 #endif
