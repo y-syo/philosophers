@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/22 14:39:31 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 11:32:34 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_data
 	unsigned int		time_sleep;
 	unsigned int		time_die;
 	unsigned int		number_of_meal;
+	unsigned int		number_of_philo;
 	char				alive;
 	unsigned long long	start_time;
 }				t_data;

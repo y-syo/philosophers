@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/22 14:57:03 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/23 12:25:50 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,11 @@ int	data_init(t_main *program, int ac, char **av)
 	program->data.time_sleep = ft_atoi(av[4]);
 	program->data.alive = 1;
 	program->data.number_of_meal = -1;
+	program->data.number_of_philo = -1;
 	if (ac == 6)
-		program->data.number_of_meal = ft_atoi(av[5]);
+	{
+		program->data.number_of_philo = ft_atoi(av[1]);
+	}
 	if (gettimeofday(&tv, NULL))
 		return (-1);
 	program->data.start_time = tv.tv_sec * 1000 + tv.tv_usec / 1000;
@@ -113,6 +116,16 @@ unsigned long long	is_alive(t_philo *philo)
 	return (0);
 }
 
+char	check_fork(pthread_mutex_t *fork, char *fork_state)
+{
+	char	value;
+
+	pthread_mutex_lock(fork);
+	value = *(fork_state);
+	pthread_mutex_unlock(fork);
+	return (value);
+}
+
 void	leave_forks(t_philo *philo)
 {
 	pthread_mutex_lock(philo->l_fork);
@@ -135,16 +148,6 @@ void	grab_forks(t_philo *philo)
 	printf(FORK_STR, get_time(philo->data->start_time), philo->id);
 }
 
-char	check_fork(pthread_mutex_t *fork, char *fork_state)
-{
-	char	value;
-
-	pthread_mutex_lock(fork);
-	value = *(fork_state);
-	pthread_mutex_unlock(fork);
-	return (value);
-}
-
 int	take_forks(t_philo *philo)
 {
 	unsigned long long	start_time;
@@ -156,7 +159,7 @@ int	take_forks(t_philo *philo)
 	while (check_fork(philo->l_fork, philo->l_fork_state)
 		|| check_fork(philo->r_fork, philo->r_fork_state))
 	{
-		usleep(100);
+		//usleep(100);
 		if (is_alive(philo))
 			return (-1);
 		elapsed_time = get_time(philo->data->start_time);
@@ -230,8 +233,6 @@ void	*philo_routine(void *arg)
 	t_philo	*philo;
 
 	philo = arg;
-	if (philo->id % 2)
-		usleep(50);
 	take_forks(philo);
 	while (!is_alive(philo))
 	{
