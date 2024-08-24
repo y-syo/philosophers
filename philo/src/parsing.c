@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 22:25:13 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 23:03:42 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/24 10:50:14 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ int	check_args(int ac, char **av)
 			return (-1);
 		i++;
 	}
-	if (ft_atoi(av[1]) > 200)
+	if (ft_atoi(av[1]) > PHILO_MAX)
 		return (-1);
 	return (0);
 }
