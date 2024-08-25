@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:39:54 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:42:45 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:08:26 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,14 @@ unsigned long long	is_alive(t_philo *philo)
 	if (philo->saturation < 0 || !check_mutex(&(philo->data->num_philo_mutex),
 			&(philo->data->number_of_philo)))
 	{
+		pthread_mutex_lock(&(philo->data->alive_mutex));
 		if (check_mutex(&(philo->data->num_philo_mutex),
 				&(philo->data->number_of_philo)))
-			print(DIED_STR, get_time(philo->data->start_time), philo);
-		pthread_mutex_lock(&(philo->data->alive_mutex));
+		{
+			pthread_mutex_lock(&(philo->data->print_mutex));
+			printf(DIED_STR, get_time(philo->data->start_time), philo->id);
+			pthread_mutex_unlock(&(philo->data->print_mutex));
+		}
 		philo->data->alive = 0;
 		pthread_mutex_unlock(&(philo->data->alive_mutex));
 		return (-1);

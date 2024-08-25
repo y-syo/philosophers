@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:39:38 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:42:33 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/25 18:55:25 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ int	eating(t_philo *philo)
 	unsigned long long	start_time;
 	unsigned long long	end_time;
 
+	if (is_alive(philo))
+		return (-1);
 	start_time = get_time(philo->data->start_time);
 	print(EATING_STR, start_time, philo);
 	end_time = start_time + philo->data->time_eat;
@@ -45,6 +47,8 @@ int	sleeping(t_philo *philo)
 	unsigned long long	start_time;
 	unsigned long long	elapsed_time;
 
+	if (is_alive(philo))
+		return (-1);
 	start_time = get_time(philo->data->start_time);
 	print(SLEEPING_STR, start_time, philo);
 	end_time = start_time + philo->data->time_sleep;

@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:39:21 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:39:30 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/25 19:06:44 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 void	print(char *str, unsigned long long timestamp, t_philo *philo)
 {
 	pthread_mutex_lock(&(philo->data->print_mutex));
-	printf(str, timestamp, philo->id);
+	if (!is_alive(philo))
+		printf(str, timestamp, philo->id);
 	pthread_mutex_unlock(&(philo->data->print_mutex));
 }
 
