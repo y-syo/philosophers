@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/24 10:56:00 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/26 11:09:01 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # include <string.h>
 
 # ifndef PHILO_MAX
-#  define PHILO_MAX 200
+#  define PHILO_MAX 350
 # endif
 
 typedef struct s_data
