@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:33 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/26 16:14:56 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/26 17:07:23 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,21 @@ void	philo(t_main *program, t_philo *philos)
 	}
 }
 
+#include <stdlib.h>
+
 int	main(int ac, char **av)
 {
 	t_main			program;
 	t_philo			philos[PHILO_MAX];
 	pthread_mutex_t	forks[PHILO_MAX];
+	//pthread_mutex_t	*forks;
 	int				forks_state[PHILO_MAX];
+	//int				*forks_state;
 
+	memset(forks, 0, sizeof(pthread_mutex_t) * PHILO_MAX);
+	memset(forks_state, 0, sizeof(int) * PHILO_MAX);
+	//forks = calloc(sizeof(pthread_mutex_t), PHILO_MAX);
+	//forks_state = calloc(sizeof(int), PHILO_MAX);
 	if (ac < 5 || ac > 6)
 	{
 		printf("bad usage: ./philo number_of_philosophers time_to_die \
