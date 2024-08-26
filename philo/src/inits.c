@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:39:04 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/23 14:39:09 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/26 15:57:20 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ void	philo_init(t_main *program, t_philo *philos,
 	unsigned int	i;
 
 	i = program->number_of_philos;
-	memset(forks, 0, sizeof(pthread_mutex_t) * PHILO_MAX);
-	memset(forks_state, 0, sizeof(char) * PHILO_MAX);
+	memset(forks, 0, sizeof(pthread_mutex_t) * i);
+	memset(forks_state, 0, sizeof(char) * i);
 	while (i)
 	{
 		i--;

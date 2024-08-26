@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/23 14:39:54 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/25 19:08:26 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/08/26 15:52:47 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ unsigned long long	is_alive(t_philo *philo)
 			&(philo->data->number_of_philo)))
 	{
 		pthread_mutex_lock(&(philo->data->alive_mutex));
+		philo->data->alive = 0;
+		pthread_mutex_unlock(&(philo->data->alive_mutex));
 		if (check_mutex(&(philo->data->num_philo_mutex),
 				&(philo->data->number_of_philo)))
 		{
@@ -27,8 +29,6 @@ unsigned long long	is_alive(t_philo *philo)
 			printf(DIED_STR, get_time(philo->data->start_time), philo->id);
 			pthread_mutex_unlock(&(philo->data->print_mutex));
 		}
-		philo->data->alive = 0;
-		pthread_mutex_unlock(&(philo->data->alive_mutex));
 		return (-1);
 	}
 	return (0);
