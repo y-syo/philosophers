@@ -6,7 +6,7 @@
 /*   By: mmoussou <mmoussou@student.42angouleme.fr  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 11:11:50 by mmoussou          #+#    #+#             */
-/*   Updated: 2024/08/26 11:09:01 by mmoussou         ###   ########.fr       */
+/*   Updated: 2024/09/11 16:50:06 by mmoussou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <pthread.h>
 # include <stdio.h>
+# include <stdlib.h>
 # include <unistd.h>
 # include <stdint.h>
 # include <sys/time.h>
